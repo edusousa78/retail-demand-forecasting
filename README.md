@@ -306,3 +306,91 @@ nem sempre se mantém em dados futuros.
 
 Essa conclusão foi preservada na documentação
 como parte da análise técnica.
+
+## 14. Dashboard gerencial de estoque
+
+O projeto inclui uma aplicação Streamlit para demonstrar
+como previsões de demanda podem apoiar decisões de estoque.
+
+### Funcionalidades
+
+- Indicadores de demanda prevista para sete dias.
+- Estoque disponível e pedidos em trânsito simulados.
+- Identificação de produtos com risco de ruptura.
+- Classificação de prioridades de reposição.
+- Quantidade sugerida para reposição por produto e loja.
+- Gráficos de demanda diária e saldo projetado.
+- Filtros por loja, produto e prioridade.
+- Exportação do plano de reposição para CSV.
+
+### Exemplo de resultado
+
+Na simulação histórica de 25/04/2016 a 01/05/2016:
+
+
+| Indicador                    |          Resultado |
+| ---------------------------- | -----------------: |
+| Demanda prevista             | 10.739,69 unidades |
+| Estoque simulado             |     6.515 unidades |
+| Reposição sugerida         |     4.279 unidades |
+| Séries com risco de ruptura |                 21 |
+| Prioridades críticas        |                  8 |
+
+Esses números representam uma demonstração histórica
+com dados operacionais simulados, não uma recomendação
+para compras reais.
+
+### Como executar o dashboard
+
+Depois de criar o ambiente virtual, instalar as
+dependências e obter os arquivos originais do M5,
+execute as etapas de preparação e avaliação descritas
+anteriormente neste README.
+
+Em seguida, gere o planejamento de estoque:
+
+```powershell
+python src/planejamento_reposicao.py
+```
+
+Inicie a aplicação:
+
+```powershell
+python -m streamlit run app.py
+```
+
+Acesse o endereço local informado pelo Streamlit,
+normalmente http://localhost:8501.
+
+### Executar os testes
+
+```powershell
+python -m pytest tests/ -v
+```
+
+Resultado da última execução local:
+
+**20 testes aprovados, nenhuma falha.**
+
+### Limitações operacionais
+
+- Os saldos de estoque são simulados.
+- Os pedidos em trânsito e prazos de entrega são simulados.
+- O estoque de segurança utiliza uma heurística.
+- O dashboard utiliza previsões históricas previamente
+  geradas, não previsões atualizadas automaticamente.
+- Os CSVs são gerados localmente e não são publicados
+  no GitHub.
+- A aplicação ainda não possui integração com ERP,
+  banco de dados operacional ou fornecedores.
+- Não deve ser utilizada para compras reais.
+
+### Próximas evoluções
+
+- Integração com dados reais de estoque.
+- Geração automatizada de previsões.
+- Regras de reposição com lead time e lote mínimo.
+- Monitoramento do desempenho do modelo.
+- Implantação da aplicação em ambiente apropriado.
+
+---
