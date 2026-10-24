@@ -1,0 +1,42 @@
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ambientes e configuracoes locais
+.env
+.env.*
+!.env.example
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dados originais e derivados
+data/raw/
+data/processed/
+
+# Modelos serializados
+*.joblib
+*.pkl
+
+# Arquivos temporarios
+*.log
+*.tmp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
