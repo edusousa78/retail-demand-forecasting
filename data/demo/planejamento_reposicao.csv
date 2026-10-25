@@ -1,0 +1,31 @@
+id,item_id,store_id,data_referencia,modelo,demanda_prevista_7d,estoque_atual_simulado,pedido_em_transito_simulado,dia_chegada_pedido,prazo_entrega_dias,estoque_seguranca_simulado,ponto_pedido,cobertura_dias,quantidade_reposicao_sugerida,saldo_final_sem_nova_reposicao,dia_primeira_ruptura,risco_ruptura,prioridade,acao_recomendada
+FOODS_3_090_CA_3_validation,FOODS_3_090,CA_3,2016-04-24,Random Forest aprimorada,775.2026,223,0,,5,127,607.3741,2.01,680,-552.2026,3.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_090_WI_3_validation,FOODS_3_090,WI_3,2016-04-24,Random Forest aprimorada,566.5168,155,137,5.0,5,131,443.8444,1.92,406,-274.5168,3.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_090_TX_2_validation,FOODS_3_090,TX_2,2016-04-24,Random Forest aprimorada,440.1777,253,0,,5,92,373.0304,4.02,280,-187.1777,5.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_586_CA_2_validation,FOODS_3_586,CA_2,2016-04-24,Random Forest aprimorada,258.4597,56,0,,5,30,196.1856,1.52,233,-202.4597,2.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_252_CA_3_validation,FOODS_3_252,CA_3,2016-04-24,Random Forest aprimorada,318.9671,98,36,5.0,4,43,204.8383,2.15,228,-184.9671,3.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_282_CA_3_validation,FOODS_3_282,CA_3,2016-04-24,Random Forest aprimorada,284.3433,102,26,6.0,4,59,210.8099,2.51,216,-156.3433,3.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_252_TX_3_validation,FOODS_3_252,TX_3,2016-04-24,Random Forest aprimorada,252.1098,91,0,,3,34,127.4717,2.53,196,-161.1098,3.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_226_WI_1_validation,FOODS_3_226,WI_1,2016-04-24,Random Forest aprimorada,256.0727,84,75,3.0,5,38,201.2111,2.3,136,-97.0727,5.0,True,CRITICA,Avaliar transferencia urgente: risco antes da nova entrega
+FOODS_3_090_CA_2_validation,FOODS_3_090,CA_2,2016-04-24,Random Forest aprimorada,331.1794,77,0,,1,34,73.0554,1.63,289,-254.1794,2.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_090_TX_3_validation,FOODS_3_090,TX_3,2016-04-24,Random Forest aprimorada,440.9244,154,112,7.0,2,47,153.9692,2.44,222,-174.9244,3.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_090_TX_1_validation,FOODS_3_090,TX_1,2016-04-24,Random Forest aprimorada,350.6996,113,42,3.0,1,23,63.8934,2.26,219,-195.6996,4.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_120_CA_3_validation,FOODS_3_120,CA_3,2016-04-24,Random Forest aprimorada,507.7908,275,75,1.0,3,60,273.0935,3.79,218,-157.7908,6.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_586_TX_1_validation,FOODS_3_586,TX_1,2016-04-24,Random Forest aprimorada,380.0462,159,72,6.0,2,32,130.0013,2.93,182,-149.0462,4.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_694_WI_3_validation,FOODS_3_694,WI_3,2016-04-24,Random Forest aprimorada,323.7219,186,0,,4,32,199.8864,4.02,170,-137.7219,5.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_681_WI_3_validation,FOODS_3_681,WI_3,2016-04-24,Random Forest aprimorada,328.4399,147,108,2.0,3,64,170.3036,3.13,138,-73.4399,6.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_090_CA_1_validation,FOODS_3_090,CA_1,2016-04-24,Random Forest aprimorada,342.5057,306,0,,4,71,232.5112,6.25,108,-36.5057,7.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_586_CA_3_validation,FOODS_3_586,CA_3,2016-04-24,Random Forest aprimorada,464.7138,254,140,2.0,1,21,83.9416,3.83,92,-70.7138,7.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_586_CA_1_validation,FOODS_3_586,CA_1,2016-04-24,Random Forest aprimorada,261.2992,150,80,3.0,3,34,131.7094,4.02,66,-31.2992,7.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_288_CA_3_validation,FOODS_3_288,CA_3,2016-04-24,Random Forest aprimorada,256.2395,243,0,,3,38,134.139,6.64,52,-13.2395,7.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_555_TX_2_validation,FOODS_3_555,TX_2,2016-04-24,Random Forest aprimorada,273.1975,184,87,3.0,4,37,174.7812,4.71,40,-2.1975,7.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_1_096_WI_2_validation,FOODS_1_096,WI_2,2016-04-24,Random Forest aprimorada,376.4348,251,132,7.0,4,36,252.4012,4.67,30,6.5652,5.0,True,ALTA,Priorizar reposicao para evitar ruptura
+FOODS_3_681_CA_3_validation,FOODS_3_681,CA_3,2016-04-24,Random Forest aprimorada,253.3397,221,56,5.0,5,52,223.3786,6.11,29,23.6603,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_226_WI_2_validation,FOODS_3_226,WI_2,2016-04-24,Random Forest aprimorada,299.0958,283,26,7.0,4,32,188.6969,6.62,23,9.9042,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_070_WI_2_validation,FOODS_3_070,WI_2,2016-04-24,Random Forest aprimorada,290.6503,280,66,6.0,2,72,145.1858,6.74,17,55.3497,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_252_CA_2_validation,FOODS_3_252,CA_2,2016-04-24,Random Forest aprimorada,236.9798,166,83,6.0,1,21,48.9832,4.9,9,12.0202,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_226_WI_3_validation,FOODS_3_226,WI_3,2016-04-24,Random Forest aprimorada,327.373,271,107,3.0,1,11,52.7645,5.79,0,50.627,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_252_TX_2_validation,FOODS_3_252,TX_2,2016-04-24,Random Forest aprimorada,327.5539,377,79,4.0,3,47,158.7018,8.06,0,128.4461,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_377_TX_3_validation,FOODS_3_377,TX_3,2016-04-24,Random Forest aprimorada,315.0736,328,44,7.0,3,23,140.0512,7.29,0,56.9264,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_586_TX_2_validation,FOODS_3_586,TX_2,2016-04-24,Random Forest aprimorada,552.347,595,40,3.0,1,29,98.3772,7.54,0,82.653,,False,BAIXA,Monitorar estoque e demanda
+FOODS_3_586_TX_3_validation,FOODS_3_586,TX_3,2016-04-24,Random Forest aprimorada,348.2362,433,108,4.0,5,37,276.1621,8.7,0,192.7638,,False,BAIXA,Monitorar estoque e demanda
