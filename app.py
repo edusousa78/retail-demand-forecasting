@@ -179,13 +179,33 @@ st.caption(
 # 4. FILTROS GERENCIAIS
 # ============================================================
 
+def limpar_filtros():
+    """Restaura a visão geral sem recarregar o navegador."""
+    st.session_state["filtro_lojas"] = []
+    st.session_state["filtro_urgencias"] = []
+    st.session_state["filtro_produto"] = None
+
+
 st.sidebar.header("Filtros gerenciais")
-st.sidebar.caption("Selecione lojas, nível de urgência e produtos.")
+st.sidebar.caption(
+    "Selecione apenas o que deseja filtrar. "
+    "Sem seleção de lojas ou urgências, todas são consideradas."
+)
+
 lojas = sorted(plano["store_id"].unique().tolist())
 lojas_selecionadas = st.sidebar.multiselect(
-    "Lojas", options=lojas, default=lojas, format_func=nome_loja,
-    help="Os nomes exibidos representam as lojas identificadas no conjunto M5.",
+    "Lojas",
+    options=lojas,
+    default=[],
+    key="filtro_lojas",
+    format_func=nome_loja,
+    placeholder="Todas as lojas",
+    help=(
+        "Deixe vazio para incluir todas as lojas. "
+        "Selecione uma ou mais lojas para restringir a análise."
+    ),
 )
+
 prioridades_disponiveis = [
     prioridade
     for prioridade in ("CRITICA", "ALTA", "MEDIA", "BAIXA")
@@ -194,28 +214,54 @@ prioridades_disponiveis = [
 prioridades_selecionadas = st.sidebar.multiselect(
     "Urgência de reposição",
     options=prioridades_disponiveis,
-    default=prioridades_disponiveis,
+    default=[],
+    key="filtro_urgencias",
     format_func=nome_prioridade,
+    placeholder="Todas as urgências",
+    help="Deixe vazio para incluir todas as prioridades.",
 )
+
 produtos = sorted(plano["item_id"].unique().tolist())
 produto_selecionado = st.sidebar.selectbox(
-    "Produto", options=[None] + produtos,
+    "Produto",
+    options=[None] + produtos,
+    index=0,
+    key="filtro_produto",
     format_func=lambda codigo: (
         "Todos os produtos" if codigo is None else nome_produto(codigo)
     ),
-    help="Nomes descritivos gerados a partir dos códigos M5; não são nomes comerciais.",
+    help="Descrições baseadas nos códigos M5, não em nomes comerciais.",
+)
+
+st.sidebar.button(
+    "Limpar filtros",
+    on_click=limpar_filtros,
+    use_container_width=True,
+    help="Volta a mostrar todas as lojas, urgências e produtos.",
+)
+
+# Lista vazia significa TODOS, e não NENHUM.
+lojas_ativas = lojas_selecionadas if lojas_selecionadas else lojas
+prioridades_ativas = (
+    prioridades_selecionadas
+    if prioridades_selecionadas
+    else prioridades_disponiveis
 )
 
 filtrado = plano.loc[
-    plano["store_id"].isin(lojas_selecionadas)
-    & plano["prioridade"].isin(prioridades_selecionadas)
+    plano["store_id"].isin(lojas_ativas)
+    & plano["prioridade"].isin(prioridades_ativas)
 ].copy()
 if produto_selecionado is not None:
     filtrado = filtrado.loc[
         filtrado["item_id"] == produto_selecionado
     ].copy()
+
 if filtrado.empty:
-    st.info("Nenhum produto encontrado para os filtros selecionados.")
+    st.info(
+        "Nenhuma combinação de produto e loja corresponde aos filtros. "
+        "Altere as opções ou clique em 'Limpar filtros' na barra lateral."
+    )
     st.stop()
 
 diario_filtrado = diario.loc[diario["id"].isin(filtrado["id"])].copy()
