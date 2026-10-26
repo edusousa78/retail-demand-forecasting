@@ -25,7 +25,7 @@ if (
     MODO_DADOS = "Resultados locais"
 else:
     PASTA_DADOS = PASTA_DEMO
-    MODO_DADOS = "Demonstracao publicada"
+    MODO_DADOS = "Demonstração publicada"
 
 ARQUIVO_PLANO = PASTA_DADOS / NOME_PLANO
 ARQUIVO_DIARIO = PASTA_DADOS / NOME_DIARIO
@@ -45,6 +45,41 @@ st.set_page_config(
 def formatar_numero(valor, casas=0):
     texto = f"{valor:,.{casas}f}"
     return texto.replace(",", "_").replace(".", ",").replace("_", ".")
+
+
+ESTADOS = {"CA": "Califórnia", "TX": "Texas", "WI": "Wisconsin"}
+CATEGORIAS = {
+    "FOODS": "Alimentos",
+    "HOUSEHOLD": "Casa e utilidades",
+    "HOBBIES": "Lazer e hobbies",
+}
+PRIORIDADES = {
+    "CRITICA": "Crítica",
+    "ALTA": "Alta",
+    "MEDIA": "Média",
+    "BAIXA": "Baixa",
+}
+
+
+def nome_loja(codigo):
+    """Apresenta um nome amigável sem alterar o código M5."""
+    partes = str(codigo).split("_")
+    if len(partes) == 2 and partes[0] in ESTADOS:
+        return f"Loja {ESTADOS[partes[0]]} {partes[1].zfill(2)}"
+    return f"Loja {codigo}"
+
+
+def nome_produto(codigo):
+    """O M5 não traz descrições comerciais dos itens."""
+    partes = str(codigo).split("_")
+    if len(partes) == 3 and partes[0] in CATEGORIAS:
+        categoria, grupo, numero = partes
+        return f"{CATEGORIAS[categoria]} · Grupo {grupo} · Produto {numero}"
+    return f"Produto {codigo}"
+
+
+def nome_prioridade(codigo):
+    return PRIORIDADES.get(str(codigo), str(codigo).capitalize())
 
 
 @st.cache_data(show_spinner="Carregando planejamento...")
@@ -126,16 +161,16 @@ data_inicio = diario["data_alvo"].min()
 data_fim = diario["data_alvo"].max()
 modelo = plano["modelo"].iloc[0]
 
-st.title("📦 NovaVarejo | Gestao de Estoque")
-st.markdown("### Planejamento de reposicao com previsao de demanda")
+st.title("📦 NovaVarejo | Gestão de Estoque")
+st.markdown("### Planejamento de reposição com previsão de demanda")
 st.warning(
-    "**Demonstracao historica:** previsoes de "
+    "**Demonstração histórica:** previsões de "
     f"{data_inicio:%d/%m/%Y} a {data_fim:%d/%m/%Y}. "
-    "Estoques, pedidos em transito e prazos de entrega sao simulados. "
-    "Os resultados nao devem ser usados para compras reais."
+    "Estoques, pedidos em trânsito e prazos de entrega são simulados. "
+    "Os resultados não devem ser usados para compras reais."
 )
 st.caption(
-    f"Dados: {MODO_DADOS} | Referencia: {data_referencia:%d/%m/%Y} "
+    f"Dados: {MODO_DADOS} | Referência: {data_referencia:%d/%m/%Y} "
     f"| Modelo: {modelo}"
 )
 
@@ -145,9 +180,11 @@ st.caption(
 # ============================================================
 
 st.sidebar.header("Filtros gerenciais")
+st.sidebar.caption("Selecione lojas, nível de urgência e produtos.")
 lojas = sorted(plano["store_id"].unique().tolist())
 lojas_selecionadas = st.sidebar.multiselect(
-    "Lojas", options=lojas, default=lojas
+    "Lojas", options=lojas, default=lojas, format_func=nome_loja,
+    help="Os nomes exibidos representam as lojas identificadas no conjunto M5.",
 )
 prioridades_disponiveis = [
     prioridade
@@ -155,31 +192,36 @@ prioridades_disponiveis = [
     if prioridade in plano["prioridade"].unique()
 ]
 prioridades_selecionadas = st.sidebar.multiselect(
-    "Prioridades",
+    "Urgência de reposição",
     options=prioridades_disponiveis,
     default=prioridades_disponiveis,
+    format_func=nome_prioridade,
 )
 produtos = sorted(plano["item_id"].unique().tolist())
 produto_selecionado = st.sidebar.selectbox(
-    "Produto", options=["Todos os produtos"] + produtos
+    "Produto", options=[None] + produtos,
+    format_func=lambda codigo: (
+        "Todos os produtos" if codigo is None else nome_produto(codigo)
+    ),
+    help="Nomes descritivos gerados a partir dos códigos M5; não são nomes comerciais.",
 )
 
 filtrado = plano.loc[
     plano["store_id"].isin(lojas_selecionadas)
     & plano["prioridade"].isin(prioridades_selecionadas)
 ].copy()
-if produto_selecionado != "Todos os produtos":
+if produto_selecionado is not None:
     filtrado = filtrado.loc[
         filtrado["item_id"] == produto_selecionado
     ].copy()
 if filtrado.empty:
-    st.info("Nenhuma serie encontrada para os filtros selecionados.")
+    st.info("Nenhum produto encontrado para os filtros selecionados.")
     st.stop()
 
 diario_filtrado = diario.loc[diario["id"].isin(filtrado["id"])].copy()
 st.sidebar.divider()
 st.sidebar.caption(
-    f"{len(filtrado)} combinacoes de produto e loja selecionadas."
+    f"{len(filtrado)} combinações de produto e loja selecionadas."
 )
 st.sidebar.caption(f"Fonte: {MODO_DADOS}")
 
@@ -208,15 +250,15 @@ with col2:
     )
 with col3:
     st.metric(
-        "Reposicao sugerida", formatar_numero(reposicao_total),
-        help="Demanda, estoque de seguranca e pedidos em transito.",
+        "Reposição sugerida", formatar_numero(reposicao_total),
+        help="Demanda, estoque de segurança e pedidos em trânsito.",
     )
 with col4:
     st.metric(
-        "Series em risco", f"{series_risco} de {len(filtrado)}",
-        help="Combinacoes produto-loja com risco de ruptura.",
+        "Produtos/lojas em risco", f"{series_risco} de {len(filtrado)}",
+        help="Combinações de produto e loja com risco de ruptura.",
     )
-st.caption(f"Prioridade critica: {series_criticas} combinacoes produto-loja.")
+st.caption(f"Prioridade crítica: {series_criticas} combinações produto-loja.")
 
 
 # ============================================================
@@ -224,7 +266,7 @@ st.caption(f"Prioridade critica: {series_criticas} combinacoes produto-loja.")
 # ============================================================
 
 st.divider()
-st.subheader("Projecao para os proximos 7 dias")
+st.subheader("Projeção para os próximos 7 dias")
 demanda_diaria = (
     diario_filtrado.groupby("data_alvo")
     .agg(
@@ -247,17 +289,17 @@ with direita:
         x_label="Data", y_label="Unidades",
     )
 st.caption(
-    "Um saldo projetado negativo representa demanda nao atendida "
-    "acumulada, e nao estoque fisico negativo."
+    "Um saldo projetado negativo representa demanda não atendida "
+    "acumulada, e não estoque físico negativo."
 )
 
 
 # ============================================================
-# 7. NECESSIDADE DE REPOSICAO POR LOJA
+# 7. NECESSIDADE DE REPOSIÇÃO POR LOJA
 # ============================================================
 
 st.divider()
-st.subheader("Necessidade de reposicao por loja")
+st.subheader("Necessidade de reposição por loja")
 lojas_resumo = (
     filtrado.groupby("store_id")
     .agg(
@@ -270,30 +312,35 @@ lojas_resumo = (
     .reset_index()
     .sort_values("reposicao_sugerida", ascending=False)
 )
+lojas_resumo["Loja"] = lojas_resumo["store_id"].map(nome_loja)
 st.bar_chart(
-    lojas_resumo.set_index("store_id")[["reposicao_sugerida"]],
+    lojas_resumo.set_index("Loja")[["reposicao_sugerida"]].rename(
+        columns={"reposicao_sugerida": "Unidades para reposição"}
+    ),
     x_label="Loja", y_label="Unidades sugeridas",
 )
 st.dataframe(
     lojas_resumo.rename(columns={
-        "store_id": "Loja",
-        "produtos": "Series",
+        "produtos": "Produtos/lojas",
         "demanda_prevista": "Demanda prevista",
         "estoque_simulado": "Estoque simulado",
-        "reposicao_sugerida": "Reposicao sugerida",
-        "series_em_risco": "Series em risco",
-    }).round(2),
+        "reposicao_sugerida": "Reposição sugerida",
+        "series_em_risco": "Produtos/lojas em risco",
+    })[
+        ["Loja", "Produtos/lojas", "Demanda prevista", "Estoque simulado",
+         "Reposição sugerida", "Produtos/lojas em risco"]
+    ].round(2),
     hide_index=True,
     use_container_width=True,
 )
 
 
 # ============================================================
-# 8. PLANO DETALHADO DE REPOSICAO
+# 8. PLANO DETALHADO DE REPOSIÇÃO
 # ============================================================
 
 st.divider()
-st.subheader("Plano detalhado de reposicao")
+st.subheader("Plano detalhado de reposição")
 ordem_prioridade = {"CRITICA": 0, "ALTA": 1, "MEDIA": 2, "BAIXA": 3}
 detalhes = filtrado.copy()
 detalhes["_ordem"] = detalhes["prioridade"].map(ordem_prioridade)
@@ -308,44 +355,57 @@ colunas_tabela = [
     "cobertura_dias", "quantidade_reposicao_sugerida",
     "acao_recomendada",
 ]
-tabela = detalhes[colunas_tabela].rename(columns={
+tabela = detalhes[colunas_tabela].copy()
+tabela["item_id"] = tabela["item_id"].map(nome_produto)
+tabela["store_id"] = tabela["store_id"].map(nome_loja)
+tabela["prioridade"] = tabela["prioridade"].map(nome_prioridade)
+tabela = tabela.rename(columns={
     "item_id": "Produto",
     "store_id": "Loja",
-    "prioridade": "Prioridade",
-    "demanda_prevista_7d": "Demanda 7 dias",
-    "estoque_atual_simulado": "Estoque atual",
-    "pedido_em_transito_simulado": "Em transito",
-    "prazo_entrega_dias": "Prazo entrega",
-    "estoque_seguranca_simulado": "Estoque seguranca",
+    "prioridade": "Urgência",
+    "demanda_prevista_7d": "Demanda em 7 dias",
+    "estoque_atual_simulado": "Estoque disponível",
+    "pedido_em_transito_simulado": "Pedidos a receber",
+    "prazo_entrega_dias": "Prazo de entrega (dias)",
+    "estoque_seguranca_simulado": "Estoque de segurança",
     "cobertura_dias": "Cobertura (dias)",
-    "quantidade_reposicao_sugerida": "Repor (unid.)",
-    "acao_recomendada": "Acao recomendada",
+    "quantidade_reposicao_sugerida": "Repor (unidades)",
+    "acao_recomendada": "Ação recomendada",
 })
 st.dataframe(tabela.round(2), hide_index=True, use_container_width=True)
 st.caption(
-    "CRITICA: ruptura projetada antes ou ate o prazo de entrega. "
-    "ALTA: ruptura posterior ao prazo, dentro dos sete dias."
+    "**Crítica:** ruptura projetada antes ou até o prazo de entrega. "
+    "**Alta:** ruptura posterior ao prazo, dentro dos sete dias."
+)
+st.caption(
+    "Os nomes de produtos são rótulos descritivos dos códigos M5, "
+    "não nomes comerciais cadastrados."
 )
 
 
 # ============================================================
-# 9. EXPORTACAO
+# 9. EXPORTAÇÃO
 # ============================================================
 
 st.divider()
-st.subheader("Exportar plano de reposicao")
-csv_exportacao = (
-    detalhes.drop(columns=["_ordem"])
-    .to_csv(index=False, sep=";", decimal=",")
-    .encode("utf-8-sig")
+st.subheader("Exportar plano de reposição")
+
+# Exportação para o gestor: rótulos legíveis, mantendo IDs para auditoria.
+exportacao = detalhes.drop(columns=["_ordem"]).copy()
+exportacao.insert(0, "nome_produto", exportacao["item_id"].map(nome_produto))
+exportacao.insert(1, "nome_loja", exportacao["store_id"].map(nome_loja))
+exportacao.insert(2, "urgencia", exportacao["prioridade"].map(nome_prioridade))
+csv_exportacao = exportacao.to_csv(index=False, sep=";", decimal=",").encode(
+    "utf-8-sig"
 )
 st.download_button(
-    label="Baixar plano de reposicao (CSV)",
+    label="Baixar plano de reposição (CSV)",
     data=csv_exportacao,
     file_name="novavarejo_plano_reposicao.csv",
     mime="text/csv",
     use_container_width=True,
 )
+st.caption("O CSV inclui nomes amigáveis e códigos originais para rastreabilidade.")
 
 
 # ============================================================
@@ -391,6 +451,6 @@ with st.expander("Metodologia, premissas e limitacoes"):
 
 st.divider()
 st.caption(
-    "NovaVarejo Brasil | Projeto educacional de Ciencia de Dados "
-    "e apoio a decisao"
+    "NovaVarejo Brasil | Projeto educacional de Ciência de Dados "
+    "e apoio à decisão"
 )
