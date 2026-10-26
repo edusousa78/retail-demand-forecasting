@@ -227,38 +227,100 @@ st.sidebar.caption(f"Fonte: {MODO_DADOS}")
 
 
 # ============================================================
-# 5. INDICADORES PRINCIPAIS
+# 5. INDICADORES GERENCIAIS
 # ============================================================
 
-st.subheader("Resumo gerencial")
-demanda_total = filtrado["demanda_prevista_7d"].sum()
-estoque_total = filtrado["estoque_atual_simulado"].sum()
-reposicao_total = filtrado["quantidade_reposicao_sugerida"].sum()
+st.subheader("Visão geral do estoque")
+st.caption(
+    "Indicadores para o período selecionado. Todos os valores respondem "
+    "aos filtros de loja, urgência e produto."
+)
+
+demanda_total = float(filtrado["demanda_prevista_7d"].sum())
+estoque_total = float(filtrado["estoque_atual_simulado"].sum())
+reposicao_total = float(filtrado["quantidade_reposicao_sugerida"].sum())
+quantidade_series = len(filtrado)
 series_risco = int(filtrado["risco_ruptura"].sum())
 series_criticas = int((filtrado["prioridade"] == "CRITICA").sum())
+series_altas = int((filtrado["prioridade"] == "ALTA").sum())
+series_sem_ruptura = quantidade_series - series_risco
+horizonte_dias = int(diario_filtrado["data_alvo"].nunique())
+media_diaria = demanda_total / horizonte_dias if horizonte_dias else 0.0
+percentual_risco = (
+    100.0 * series_risco / quantidade_series if quantidade_series else 0.0
+)
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric(
-        "Demanda prevista", formatar_numero(demanda_total, 2),
-        help="Unidades previstas para sete dias.",
-    )
-with col2:
-    st.metric(
-        "Estoque simulado", formatar_numero(estoque_total),
-        help="Saldo inicial simulado.",
-    )
-with col3:
-    st.metric(
-        "Reposição sugerida", formatar_numero(reposicao_total),
-        help="Demanda, estoque de segurança e pedidos em trânsito.",
-    )
-with col4:
-    st.metric(
-        "Produtos/lojas em risco", f"{series_risco} de {len(filtrado)}",
-        help="Combinações de produto e loja com risco de ruptura.",
-    )
-st.caption(f"Prioridade crítica: {series_criticas} combinações produto-loja.")
+# st.container(border=True) cria cartões sem CSS customizado.
+# Os valores são agregados apenas sobre a seleção atual.
+col_demanda, col_estoque, col_repor, col_risco = st.columns(4, gap="small")
+
+with col_demanda:
+    with st.container(border=True):
+        st.metric(
+            label="Demanda prevista · 7 dias",
+            value=formatar_numero(demanda_total, 2),
+            help="Soma das previsões de demanda para as séries selecionadas.",
+        )
+        st.caption(
+            f"**{formatar_numero(media_diaria, 2)} un./dia** "
+            "em média no horizonte."
+        )
+
+with col_estoque:
+    with st.container(border=True):
+        st.metric(
+            label="Estoque inicial simulado",
+            value=formatar_numero(estoque_total),
+            help="Soma dos estoques simulados na data de referência.",
+        )
+        st.caption(
+            "Saldo disponível antes das vendas previstas; "
+            "não representa estoque real."
+        )
+
+with col_repor:
+    with st.container(border=True):
+        st.metric(
+            label="Reposição sugerida",
+            value=formatar_numero(reposicao_total),
+            help=(
+                "Soma das quantidades calculadas por produto e loja, "
+                "considerando previsão, segurança e pedidos em trânsito."
+            ),
+        )
+        st.caption(
+            "Unidades sugeridas para o plano; "
+            "o prazo de entrega pode impedir evitar rupturas."
+        )
+
+with col_risco:
+    with st.container(border=True):
+        st.metric(
+            label="Séries com risco de ruptura",
+            value=f"{formatar_numero(percentual_risco, 1)}%",
+            help=(
+                "Percentual de combinações produto-loja com risco de ruptura "
+                "projetado no horizonte. Não é taxa de ruptura observada."
+            ),
+        )
+        st.caption(
+            f"**{series_risco} de {quantidade_series}** "
+            "combinações produto-loja."
+        )
+
+st.progress(
+    min(max(percentual_risco / 100.0, 0.0), 1.0),
+    text="Participação das combinações com risco de ruptura",
+)
+st.caption(
+    f"**Prioridade crítica:** {series_criticas}  ·  "
+    f"**Prioridade alta:** {series_altas}  ·  "
+    f"**Sem ruptura projetada:** {series_sem_ruptura}"
+)
+st.caption(
+    "A análise é histórica e usa estoque simulado. "
+    "A soma de unidades não substitui a avaliação individual de cada produto e loja."
+)
 
 
 # ============================================================
